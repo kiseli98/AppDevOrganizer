@@ -1,8 +1,8 @@
-package md.utm.organizer.data
+package md.utm.organizer.data.network
 
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import kotlinx.coroutines.Deferred
-import md.utm.organizer.data.response.CurrentWeatherResponse
+import md.utm.organizer.data.network.response.CurrentWeatherResponse
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -26,7 +26,9 @@ interface WeatherstackApiService {
     companion object {
         //implicit method, similar to constructor in a way -> ClassName()
         //used to initialize the service
-        operator fun invoke(): WeatherstackApiService {
+        operator fun invoke(
+            connectivityInterceptor: ConnectivityInterceptor
+        ): WeatherstackApiService {
             // Typically interceptors add, remove, or transform headers on the request or response
             val requestInterceptor = Interceptor { chain ->
                 val url = chain.request()
@@ -45,6 +47,7 @@ interface WeatherstackApiService {
 
             val okHttpClient = OkHttpClient.Builder()
                 .addInterceptor(requestInterceptor)
+                .addInterceptor(connectivityInterceptor) // injection ( by Kodein)
                 .build()
 
             return Retrofit.Builder()

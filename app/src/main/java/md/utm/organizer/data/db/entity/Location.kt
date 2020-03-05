@@ -1,4 +1,4 @@
-package md.utm.organizer.data.response
+package md.utm.organizer.data.db.entity
 
 
 import com.google.gson.annotations.SerializedName
