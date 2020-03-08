@@ -26,7 +26,7 @@ class ForecastRepositoryImpl(
     override var isMetric: Boolean = true
 
     override suspend fun getCurrentWeather(isMetric: Boolean): LiveData<CurrentWeatherEntry> {
-        val isTypeChanged: Boolean = this.isMetric == isMetric
+        var isTypeChanged: Boolean = this.isMetric != isMetric
         this.isMetric = isMetric
         //as Global launch but returns smth
         return withContext(Dispatchers.IO) {
@@ -51,7 +51,7 @@ class ForecastRepositoryImpl(
     // -> downloadedCurrentData is updated/fetched -> persist it to local database
     private suspend fun fetchCurrentWeather() {
         weatherNetworkDataSource.fetchCurrentWeather(
-            "London",
+            "Chisinau",
             if (this.isMetric) "m" else "f"
         )
     }

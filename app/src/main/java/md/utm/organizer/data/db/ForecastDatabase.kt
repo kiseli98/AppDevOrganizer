@@ -8,7 +8,7 @@ import md.utm.organizer.data.db.entity.CurrentWeatherEntry
 
 @Database(
     entities = [CurrentWeatherEntry::class],
-    version = 1
+    version = 2
 )
 abstract class ForecastDatabase : RoomDatabase() {
     abstract fun currentWeatherDao(): CurrentWeatherDao
@@ -24,6 +24,7 @@ abstract class ForecastDatabase : RoomDatabase() {
         private fun buildDatabase(context: Context) =
             Room.databaseBuilder(context.applicationContext,
                 ForecastDatabase::class.java, "forecast.db")
+                .fallbackToDestructiveMigration()
                 .build()
     }
 }

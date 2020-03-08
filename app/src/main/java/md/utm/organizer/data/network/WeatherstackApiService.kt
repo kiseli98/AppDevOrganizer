@@ -19,7 +19,7 @@ interface WeatherstackApiService {
     @GET("current")
     fun getCurrentWeather(
         @Query("query") location: String,
-        @Query("unit") units: String = "m"
+        @Query("units") units: String
     ): Deferred<CurrentWeatherResponse>  // await for deferred. Once Response is ready -> start working with it
 
     //static methods, tied to Class

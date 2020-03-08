@@ -1,9 +1,12 @@
 package md.utm.organizer
 
 import android.app.Application
+import androidx.preference.PreferenceManager
 import com.jakewharton.threetenabp.AndroidThreeTen
 import md.utm.organizer.data.db.ForecastDatabase
 import md.utm.organizer.data.network.*
+import md.utm.organizer.data.provider.UnitProvider
+import md.utm.organizer.data.provider.UnitProviderImpl
 import md.utm.organizer.data.repository.ForecastRepository
 import md.utm.organizer.data.repository.ForecastRepositoryImpl
 import md.utm.organizer.ui.weather.current.CurrentWeatherViewModelFactory
@@ -32,11 +35,14 @@ class OrganizerApplication : Application(), KodeinAware {
         bind<WeatherNetworkDataSource>() with singleton { WeatherNetworkDataSourceImpl(instance()) }
         //needs 2 instances - WeatherNetworkDataSource and currentWeatherDao
         bind<ForecastRepository>() with singleton { ForecastRepositoryImpl(instance(), instance()) }
-        bind() from provider { CurrentWeatherViewModelFactory(instance()) } //provider because no singletons are required
+        bind<UnitProvider>() with singleton { UnitProviderImpl(instance()) }
+        bind() from provider { CurrentWeatherViewModelFactory(instance(), instance()) } //provider because no singletons are required
     }
 
     override fun onCreate() {
         super.onCreate()
         AndroidThreeTen.init(this)
+        //set default preferences if not specified
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false)
     }
 }

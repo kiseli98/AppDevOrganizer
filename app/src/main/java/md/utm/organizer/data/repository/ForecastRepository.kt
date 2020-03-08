@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import md.utm.organizer.data.db.entity.CurrentWeatherEntry
 
 interface ForecastRepository {
-    val isMetric: Boolean
+    var isMetric: Boolean
 
     suspend fun getCurrentWeather(isMetric: Boolean): LiveData<CurrentWeatherEntry>
 }
