@@ -6,18 +6,23 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import md.utm.organizer.data.db.CurrentWeatherDao
+import md.utm.organizer.data.db.RequestDao
 import md.utm.organizer.data.db.WeatherLocationDao
 import md.utm.organizer.data.db.entity.CurrentWeatherEntry
+import md.utm.organizer.data.db.entity.Request
 import md.utm.organizer.data.db.entity.WeatherLocation
 import md.utm.organizer.data.network.WeatherNetworkDataSource
 import md.utm.organizer.data.network.response.CurrentWeatherResponse
 import md.utm.organizer.data.provider.LocationProvider
+import md.utm.organizer.data.provider.UnitProvider
 import org.threeten.bp.ZonedDateTime
 
 class ForecastRepositoryImpl(
     private val currentWeatherDao: CurrentWeatherDao,
     private val weatherLocationDao: WeatherLocationDao,
     private val locationProvider: LocationProvider,
+    private val unitProvider: UnitProvider,
+    private val requestDao: RequestDao,
     private val weatherNetworkDataSource: WeatherNetworkDataSource
 ) : ForecastRepository {
 
@@ -28,14 +33,10 @@ class ForecastRepositoryImpl(
         }
     }
 
-    override var isMetric: Boolean = true
-
-    override suspend fun getCurrentWeather(isMetric: Boolean): LiveData<CurrentWeatherEntry> {
-        var isTypeChanged: Boolean = this.isMetric != isMetric
-        this.isMetric = isMetric
+    override suspend fun getCurrentWeather(): LiveData<CurrentWeatherEntry> {
         //as Global launch but returns smth
         return withContext(Dispatchers.IO) {
-            initWeatherData(isTypeChanged)
+            initWeatherData()
             return@withContext currentWeatherDao.getWeather()
         }
     }
@@ -43,6 +44,12 @@ class ForecastRepositoryImpl(
     override suspend fun getWeaherLocation(): LiveData<WeatherLocation> {
         return withContext(Dispatchers.IO) {
             return@withContext weatherLocationDao.getLocation()
+        }
+    }
+
+    override suspend fun getRequest(): LiveData<Request> {
+        return withContext(Dispatchers.IO) {
+            return@withContext requestDao.getRequest()
         }
     }
 
@@ -54,8 +61,9 @@ class ForecastRepositoryImpl(
         }
     }
 
-    private suspend fun initWeatherData(isTypeChanged: Boolean) {
+    private suspend fun initWeatherData() {
         val lastWeatherLocation = weatherLocationDao.getLocation().value
+        val lastRequest = requestDao.getRequest().value
 
         //first time launch
         if(lastWeatherLocation == null || locationProvider.hasLocationChanged(lastWeatherLocation)) {
@@ -63,7 +71,12 @@ class ForecastRepositoryImpl(
             return
         }
 
-        if (isTypeChanged || isFetchCurrentNeeded(lastWeatherLocation.zonedDateTime))
+        if(lastRequest == null || unitProvider.hasUnitSystemChanged(lastRequest)) {
+            fetchCurrentWeather()
+            return
+        }
+
+        if (isFetchCurrentNeeded(lastWeatherLocation.zonedDateTime))
             fetchCurrentWeather()
     }
 
@@ -72,7 +85,7 @@ class ForecastRepositoryImpl(
     private suspend fun fetchCurrentWeather() {
         weatherNetworkDataSource.fetchCurrentWeather(
             locationProvider.getPreferredLocationString(),
-            if (this.isMetric) "m" else "f"
+            unitProvider.getUnitSystem().abbreviation
         )
     }
 

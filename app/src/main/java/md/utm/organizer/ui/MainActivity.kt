@@ -1,15 +1,42 @@
 package md.utm.organizer.ui
 
-import androidx.appcompat.app.AppCompatActivity
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationResult
 import kotlinx.android.synthetic.main.activity_main.*
 import md.utm.organizer.R
+import org.kodein.di.KodeinAware
+import org.kodein.di.android.closestKodein
+import org.kodein.di.generic.instance
 
-class MainActivity : AppCompatActivity() {
+//request code
+private const val MY_PERMISSION_ACCESS_COARSE_LOCATION = 1
+
+class MainActivity : AppCompatActivity(), KodeinAware {
+
+    override val kodein by closestKodein()
+
+    //caches location
+    private val fusedLocationProviderClient: FusedLocationProviderClient by instance()
+
+    // basically anonymous class
+    // no changes just to get location
+    private val locationCallback = object : LocationCallback() {
+        override fun onLocationResult(p0: LocationResult?) {
+            super.onLocationResult(p0)
+        }
+    }
 
     private lateinit var navController: NavController
 
@@ -23,6 +50,52 @@ class MainActivity : AppCompatActivity() {
         bottom_nav.setupWithNavController(navController)
 
         NavigationUI.setupActionBarWithNavController(this, navController)
+
+        //upon very first start only
+        requestLocationPermission()
+
+        if (hasLocationPermission()) {
+            bindLocationManager()
+        } else
+            requestLocationPermission()
+    }
+
+    private fun bindLocationManager() {
+        LifecycleBoundLocationManager(
+            this,
+            fusedLocationProviderClient, locationCallback
+        )
+    }
+
+    private fun hasLocationPermission(): Boolean {
+        return ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
+
+    //request perm for
+    private fun requestLocationPermission() {
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION),
+            MY_PERMISSION_ACCESS_COARSE_LOCATION
+        )
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        if (requestCode == MY_PERMISSION_ACCESS_COARSE_LOCATION) {
+            //0 because only one is required
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                bindLocationManager()
+            else
+                Toast.makeText(this, "Please, set location manually in settings", Toast.LENGTH_LONG).show()
+        }
     }
 
     override fun onSupportNavigateUp(): Boolean {

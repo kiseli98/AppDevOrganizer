@@ -9,7 +9,7 @@
             android:title="Use device location" />
 
         <EditTextPreference
-            android:defaultValue="Chisinau"
+            android:defaultValue="London"
             android:dependency="USE_DEVICE_LOCATION"
             android:key="CUSTOM_LOCATION"
             android:summary="The location for which the weather is displayed"

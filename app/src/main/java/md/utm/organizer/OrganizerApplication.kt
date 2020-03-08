@@ -1,7 +1,9 @@
 package md.utm.organizer
 
 import android.app.Application
+import android.content.Context
 import androidx.preference.PreferenceManager
+import com.google.android.gms.location.LocationServices
 import com.jakewharton.threetenabp.AndroidThreeTen
 import md.utm.organizer.data.db.ForecastDatabase
 import md.utm.organizer.data.db.WeatherLocationDao
@@ -33,14 +35,17 @@ class OrganizerApplication : Application(), KodeinAware {
         //<>instance type, returns whatever from above
         bind() from singleton { instance<ForecastDatabase>().currentWeatherDao() }
         bind() from singleton { instance<ForecastDatabase>().weatherLocationDao() }
+        bind() from singleton { instance<ForecastDatabase>().requestDao() }
         //injecting dependencies by binding implementations to particular interface types
         bind<ConnectivityInterceptor>() with singleton { ConnectivityInterceptorImpl(instance()) } //bind with() to bind different class types
         bind() from singleton { WeatherstackApiService(instance()) }
         bind<WeatherNetworkDataSource>() with singleton { WeatherNetworkDataSourceImpl(instance()) }
-        bind<LocationProvider>() with singleton { LocationProviderImpl() }
-        //needs 4 instances - WeatherNetworkDataSource and currentWeatherDao, Location Provider and WeatherLocationDao
-        bind<ForecastRepository>() with singleton { ForecastRepositoryImpl(instance(), instance(), instance(), instance()) }
+        bind() from provider { LocationServices.getFusedLocationProviderClient(instance<Context>()) }
+        //one for context, one for location service
+        bind<LocationProvider>() with singleton { LocationProviderImpl(instance(), instance()) }
         bind<UnitProvider>() with singleton { UnitProviderImpl(instance()) }
+        //needs 4 instances - WeatherNetworkDataSource and currentWeatherDao, Location Provider and WeatherLocationDao
+        bind<ForecastRepository>() with singleton { ForecastRepositoryImpl(instance(), instance(), instance(), instance(), instance(), instance()) }
         bind() from provider { CurrentWeatherViewModelFactory(instance(), instance()) } //provider because no singletons are required
     }
 

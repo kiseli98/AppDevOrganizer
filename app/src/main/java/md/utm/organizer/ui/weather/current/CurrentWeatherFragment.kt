@@ -51,9 +51,7 @@ class CurrentWeatherFragment : ScopedFragment(), KodeinAware {
             if (location == null) return@Observer
             updateLocation(location.name)
 
-        }
-
-        )
+        })
 
         // observe from database
         currentWeather.observe(this@CurrentWeatherFragment, Observer {
