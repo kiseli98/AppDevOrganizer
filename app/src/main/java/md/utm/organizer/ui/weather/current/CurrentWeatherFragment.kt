@@ -44,6 +44,17 @@ class CurrentWeatherFragment : ScopedFragment(), KodeinAware {
     // @ScopedFragment
     private fun bindUI() = launch {
         val currentWeather = viewModel.weather.await() //because is deferred
+
+        val weatherLocation =  viewModel.weatherLocation.await()
+
+        weatherLocation.observe(this@CurrentWeatherFragment, Observer { location ->
+            if (location == null) return@Observer
+            updateLocation(location.name)
+
+        }
+
+        )
+
         // observe from database
         currentWeather.observe(this@CurrentWeatherFragment, Observer {
 
@@ -51,7 +62,6 @@ class CurrentWeatherFragment : ScopedFragment(), KodeinAware {
             if (it == null) return@Observer
 
             group_loading.visibility = View.GONE
-            updateLocation("Chisinau")
             updateDateToToday()
             updateTemperatures(it.temperature, it.feelslike)
             updateCondition(it.weatherDescriptions[0]) // returns array with one element

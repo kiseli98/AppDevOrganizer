@@ -1,5 +1,6 @@
 package md.utm.organizer.internal
 
-enum class UnitSystem {
-    METRIC, IMPERIAL
+enum class UnitSystem(val abbreviation: String) {
+    METRIC("m"),
+    IMPERIAL("f")
 }

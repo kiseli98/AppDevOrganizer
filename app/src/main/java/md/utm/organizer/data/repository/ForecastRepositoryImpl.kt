@@ -6,13 +6,18 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import md.utm.organizer.data.db.CurrentWeatherDao
+import md.utm.organizer.data.db.WeatherLocationDao
 import md.utm.organizer.data.db.entity.CurrentWeatherEntry
+import md.utm.organizer.data.db.entity.WeatherLocation
 import md.utm.organizer.data.network.WeatherNetworkDataSource
 import md.utm.organizer.data.network.response.CurrentWeatherResponse
+import md.utm.organizer.data.provider.LocationProvider
 import org.threeten.bp.ZonedDateTime
 
 class ForecastRepositoryImpl(
     private val currentWeatherDao: CurrentWeatherDao,
+    private val weatherLocationDao: WeatherLocationDao,
+    private val locationProvider: LocationProvider,
     private val weatherNetworkDataSource: WeatherNetworkDataSource
 ) : ForecastRepository {
 
@@ -35,15 +40,30 @@ class ForecastRepositoryImpl(
         }
     }
 
+    override suspend fun getWeaherLocation(): LiveData<WeatherLocation> {
+        return withContext(Dispatchers.IO) {
+            return@withContext weatherLocationDao.getLocation()
+        }
+    }
+
     private fun persistFetchedCurrentWeather(fetchedWeather: CurrentWeatherResponse) {
         // Disp.IO - spin up lots of little threads
         GlobalScope.launch(Dispatchers.IO) {
             currentWeatherDao.upsert(fetchedWeather.currentWeatherEntry)
+            weatherLocationDao.upsert(fetchedWeather.location)
         }
     }
 
     private suspend fun initWeatherData(isTypeChanged: Boolean) {
-        if (isTypeChanged || isFetchCurrentNeeded(ZonedDateTime.now().minusHours(1)))
+        val lastWeatherLocation = weatherLocationDao.getLocation().value
+
+        //first time launch
+        if(lastWeatherLocation == null || locationProvider.hasLocationChanged(lastWeatherLocation)) {
+            fetchCurrentWeather()
+            return
+        }
+
+        if (isTypeChanged || isFetchCurrentNeeded(lastWeatherLocation.zonedDateTime))
             fetchCurrentWeather()
     }
 
@@ -51,7 +71,7 @@ class ForecastRepositoryImpl(
     // -> downloadedCurrentData is updated/fetched -> persist it to local database
     private suspend fun fetchCurrentWeather() {
         weatherNetworkDataSource.fetchCurrentWeather(
-            "Chisinau",
+            locationProvider.getPreferredLocationString(),
             if (this.isMetric) "m" else "f"
         )
     }
