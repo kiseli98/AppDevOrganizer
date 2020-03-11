@@ -1,5 +1,6 @@
 package md.utm.organizer.ui.weather.current
 
+import android.util.Log
 import androidx.lifecycle.ViewModel;
 import md.utm.organizer.data.provider.UnitProvider
 import md.utm.organizer.data.repository.ForecastRepository
@@ -20,11 +21,4 @@ class CurrentWeatherViewModel(
         forecastRepository.getCurrentWeather()
     }
 
-    val weatherLocation by lazyDeffered {
-        forecastRepository.getWeaherLocation()
-    }
-
-    val request by lazyDeffered {
-        forecastRepository.getRequest()
-    }
 }

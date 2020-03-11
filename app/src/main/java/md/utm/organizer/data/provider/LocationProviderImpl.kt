@@ -8,7 +8,7 @@ import android.location.Location
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import kotlinx.coroutines.Deferred
-import md.utm.organizer.data.db.entity.WeatherLocation
+import md.utm.organizer.data.network.response.currentWeather.CurrentWeatherModel
 import md.utm.organizer.internal.LocationPermissionNotGrantedException
 import md.utm.organizer.internal.asDeferred
 import kotlin.math.abs
@@ -23,37 +23,44 @@ class LocationProviderImpl(
 
     private val appContext = context.applicationContext
 
-    override suspend fun getPreferredLocationString(): String {
-        if (isUsingDeviceLocation()) {
-            try {
-                val deviceLocation = getLastDeviceLocation().await()
-                    ?: return "${getCustomLocationName()}"
-                return "${deviceLocation.latitude},${deviceLocation.longitude}"
-            } catch (e: LocationPermissionNotGrantedException){
-                return "${getCustomLocationName()}"
-            }
+
+    override suspend fun getCoords(): HashMap<String, String> {
+        val coords = HashMap<String, String>()
+        try {
+            val deviceLocation = getLastDeviceLocation().await() ?: return coords
+            coords["latitude"] = "${deviceLocation.latitude}"
+            coords["longitude"] = "${deviceLocation.longitude}"
+            return coords
+        } catch (e: LocationPermissionNotGrantedException){
+            return coords
         }
-        else
-            return "${getCustomLocationName()}"
     }
 
-    override suspend fun hasLocationChanged(lastWeatherLocation: WeatherLocation): Boolean {
+    override suspend fun getLocation(): String {
+        return "${getCustomLocationName()}"
+    }
+
+    override suspend fun isUsingDeviceLocation(): Boolean {
+        return preferences.getBoolean(USE_DEVICE_LOCATION, true)
+    }
+
+    override suspend fun hasLocationChanged(lastWeatherEntry: CurrentWeatherModel): Boolean {
         val deviceLocationChanged = try {
-            hasDeviceLocationChanged(lastWeatherLocation)
+            hasDeviceLocationChanged(lastWeatherEntry)
             //custom exception
         } catch (e: LocationPermissionNotGrantedException) {
             false
         }
 
-        return deviceLocationChanged || hasCustomLocationChanged(lastWeatherLocation)
+        return deviceLocationChanged || hasCustomLocationChanged(lastWeatherEntry)
     }
 
-    private fun hasCustomLocationChanged(lastWeatherLocation: WeatherLocation): Boolean {
+    private fun hasCustomLocationChanged(lastWeatherEntry: CurrentWeatherModel): Boolean {
         val customLocationName = getCustomLocationName()
-        return customLocationName != lastWeatherLocation.name
+        return customLocationName != lastWeatherEntry.name
     }
 
-    private suspend fun hasDeviceLocationChanged(lastWeatherLocation: WeatherLocation): Boolean {
+    private suspend fun hasDeviceLocationChanged(lastWeatherEntry: CurrentWeatherModel): Boolean {
         if (!isUsingDeviceLocation())
             return false
 
@@ -61,8 +68,8 @@ class LocationProviderImpl(
             ?: return false
 
         val comparisonThreshold = 0.03
-        return abs(deviceLocation.latitude - lastWeatherLocation.lat) > comparisonThreshold &&
-                abs(deviceLocation.longitude - lastWeatherLocation.lon) > comparisonThreshold
+        return abs(deviceLocation.latitude - lastWeatherEntry.coord.lat) > comparisonThreshold &&
+                abs(deviceLocation.longitude - lastWeatherEntry.coord.lon) > comparisonThreshold
 
     }
 
@@ -81,13 +88,8 @@ class LocationProviderImpl(
         ) == PackageManager.PERMISSION_GRANTED
     }
 
-    private fun isUsingDeviceLocation(): Boolean {
-        return preferences.getBoolean(USE_DEVICE_LOCATION, true)
-    }
-
     private fun getCustomLocationName(): String? {
         return preferences.getString(CUSTOM_LOCATION, null)
     }
-
 
 }

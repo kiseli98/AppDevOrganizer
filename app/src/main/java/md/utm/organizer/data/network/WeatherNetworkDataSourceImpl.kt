@@ -3,7 +3,7 @@ package md.utm.organizer.data.network
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import md.utm.organizer.data.network.response.CurrentWeatherResponse
+import md.utm.organizer.data.network.response.currentWeather.CurrentWeatherModel
 import md.utm.organizer.internal.NoConnectivityException
 
 class WeatherNetworkDataSourceImpl(
@@ -11,14 +11,25 @@ class WeatherNetworkDataSourceImpl(
 ) : WeatherNetworkDataSource {
 
     // backing val for downloadedCurrentWeather is not mutable LiveData
-    private val _downloadedCurrentWeather = MutableLiveData<CurrentWeatherResponse>()
+    private val _downloadedCurrentWeather = MutableLiveData<CurrentWeatherModel>()
 
-    override val downloadedCurrentWeather: LiveData<CurrentWeatherResponse>
+    override val downloadedCurrentWeather: LiveData<CurrentWeatherModel>
         get() = _downloadedCurrentWeather //casting of MutableLiveData to LiveData
 
-    override suspend fun fetchCurrentWeather(location: String, units: String) {
+    override suspend fun fetchCurrentWeatherByLoc(location: String?, units: String, language: String) {
         try {
-            val fetchedCurrentWeather = weatherstackApiService.getCurrentWeather(location, units).await()
+            val fetchedCurrentWeather = weatherstackApiService.getCurrentWeatherByLoc(location, units, language).await()
+            _downloadedCurrentWeather.postValue(fetchedCurrentWeather)
+        }
+        catch (e: NoConnectivityException) {
+            Log.e("Connectivity", "No internet connection.", e)
+        }
+    }
+
+
+    override suspend fun fetchCurrentWeatherByCoord(latitude: String?, longitude: String?, units: String, language: String) {
+        try {
+            val fetchedCurrentWeather = weatherstackApiService.getCurrentWeatherByCoord(latitude, longitude, units, language).await()
             _downloadedCurrentWeather.postValue(fetchedCurrentWeather)
         }
         catch (e: NoConnectivityException) {

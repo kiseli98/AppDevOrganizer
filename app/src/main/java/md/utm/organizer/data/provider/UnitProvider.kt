@@ -1,10 +1,10 @@
 package md.utm.organizer.data.provider
 
-import md.utm.organizer.data.db.entity.Request
 import md.utm.organizer.internal.UnitSystem
 
 interface UnitProvider {
+    var initialUnitSystem: UnitSystem
     fun getUnitSystem(): UnitSystem
-    suspend fun hasUnitSystemChanged(request: Request): Boolean
+    suspend fun hasUnitSystemChanged(): Boolean
 
 }

@@ -7,9 +7,7 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import kotlinx.android.synthetic.main.current_weather_fragment.*
-import kotlinx.android.synthetic.main.current_weather_fragment.view.*
 import kotlinx.coroutines.launch
 import md.utm.organizer.R
 import md.utm.organizer.internal.glide.GlideApp
@@ -45,13 +43,6 @@ class CurrentWeatherFragment : ScopedFragment(), KodeinAware {
     private fun bindUI() = launch {
         val currentWeather = viewModel.weather.await() //because is deferred
 
-        val weatherLocation =  viewModel.weatherLocation.await()
-
-        weatherLocation.observe(this@CurrentWeatherFragment, Observer { location ->
-            if (location == null) return@Observer
-            updateLocation(location.name)
-
-        })
 
         // observe from database
         currentWeather.observe(this@CurrentWeatherFragment, Observer {
@@ -61,19 +52,20 @@ class CurrentWeatherFragment : ScopedFragment(), KodeinAware {
 
             group_loading.visibility = View.GONE
             updateDateToToday()
-            updateTemperatures(it.temperature, it.feelslike)
-            updateCondition(it.weatherDescriptions[0]) // returns array with one element
-            updatePrecipitation(it.precip)
-            updateWind(it.windDir, it.windSpeed)
-            updateHumidity(it.humidity)
-            updateCloudcover(it.cloudcover)
+            updateTemperatures(it.main.temp, it.main.feelsLike)
+            updateCondition(it.weatherDescription[0].description) // returns array with one element
+//            updatePrecipitation(it.precip)
+            updateWind(it.wind.speed)
+            updateHumidity(it.main.humidity)
+            updateCloudcover(it.clouds.percentage)
             updateVisibility(it.visibility)
 
             //Image is also cached
+            //"http://openweathermap.org/img/w/" + iconcode + ".png";
             val radius = context?.resources?.getDimensionPixelSize(R.dimen.corner_radius)
             GlideApp.with(this@CurrentWeatherFragment)
-                .load(it.weatherIcons[0])
-                .transform(RoundedCorners(radius!!))
+                .load("http://openweathermap.org/img/w/${it.weatherDescription[0].icon}.png")
+//                .transform(RoundedCorners(radius!!))
                 .into(imageView_condition_icon)
         })
     }
@@ -108,9 +100,9 @@ class CurrentWeatherFragment : ScopedFragment(), KodeinAware {
         textView_precipitation.text = "Precipitation: $precipitationVolume $unitAbbreviation"
     }
 
-    private fun updateWind(windDirection: String, windSpeed: Double) {
+    private fun updateWind(windSpeed: Double) {
         val unitAbbreviation = chooseLocalizedUnitAbbreviation("km/h", "mph")
-        textView_wind.text = "Wind: $windDirection $windSpeed $unitAbbreviation"
+        textView_wind.text = "Wind: $windSpeed $unitAbbreviation"
     }
 
     private fun updateHumidity(humidityPercentage: Double) {
