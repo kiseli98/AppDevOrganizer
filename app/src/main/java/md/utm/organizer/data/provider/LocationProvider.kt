@@ -1,11 +1,11 @@
 package md.utm.organizer.data.provider
 
-import md.utm.organizer.data.network.response.currentWeather.CurrentWeatherModel
+import md.utm.organizer.data.db.entity.CurrentWeatherEntry
 
 interface LocationProvider {
-    suspend fun hasLocationChanged(lastWeatherEntry : CurrentWeatherModel): Boolean
+    suspend fun hasLocationChanged(lastWeatherEntry : CurrentWeatherEntry): Boolean
     //return either device or custom location
     suspend fun getCoords() : HashMap<String, String>
     suspend fun getLocation() : String
-    suspend fun isUsingDeviceLocation(): Boolean
+    fun isUsingDeviceLocation(): Boolean
 }

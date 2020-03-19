@@ -4,14 +4,19 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import md.utm.organizer.data.network.response.currentWeather.CurrentWeatherModel
+import androidx.room.TypeConverters
+import md.utm.organizer.data.db.entity.CurrentWeatherEntry
+import md.utm.organizer.data.db.entity.FutureWeatherEntry
+import md.utm.organizer.utils.Converters
 
 @Database(
-    entities = [CurrentWeatherModel::class],
+    entities = [CurrentWeatherEntry::class, FutureWeatherEntry::class],
     version = 1
 )
+@TypeConverters(Converters::class)
 abstract class ForecastDatabase : RoomDatabase() {
     abstract fun currentWeatherDao(): CurrentWeatherDao
+    abstract fun futureWeatherDao(): FutureWeatherDao
 
     companion object {
         @Volatile private var instance: ForecastDatabase? = null
@@ -23,7 +28,7 @@ abstract class ForecastDatabase : RoomDatabase() {
 
         private fun buildDatabase(context: Context) =
             Room.databaseBuilder(context.applicationContext,
-                ForecastDatabase::class.java, "forecastN.db")
+                ForecastDatabase::class.java, "forecastNew.db")
                 .build()
     }
 }

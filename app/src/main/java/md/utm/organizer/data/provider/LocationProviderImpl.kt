@@ -8,7 +8,7 @@ import android.location.Location
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import kotlinx.coroutines.Deferred
-import md.utm.organizer.data.network.response.currentWeather.CurrentWeatherModel
+import md.utm.organizer.data.db.entity.CurrentWeatherEntry
 import md.utm.organizer.internal.LocationPermissionNotGrantedException
 import md.utm.organizer.internal.asDeferred
 import kotlin.math.abs
@@ -31,7 +31,7 @@ class LocationProviderImpl(
             coords["latitude"] = "${deviceLocation.latitude}"
             coords["longitude"] = "${deviceLocation.longitude}"
             return coords
-        } catch (e: LocationPermissionNotGrantedException){
+        } catch (e: LocationPermissionNotGrantedException) {
             return coords
         }
     }
@@ -40,11 +40,11 @@ class LocationProviderImpl(
         return "${getCustomLocationName()}"
     }
 
-    override suspend fun isUsingDeviceLocation(): Boolean {
+    override fun isUsingDeviceLocation(): Boolean {
         return preferences.getBoolean(USE_DEVICE_LOCATION, true)
     }
 
-    override suspend fun hasLocationChanged(lastWeatherEntry: CurrentWeatherModel): Boolean {
+    override suspend fun hasLocationChanged(lastWeatherEntry: CurrentWeatherEntry): Boolean {
         val deviceLocationChanged = try {
             hasDeviceLocationChanged(lastWeatherEntry)
             //custom exception
@@ -55,12 +55,15 @@ class LocationProviderImpl(
         return deviceLocationChanged || hasCustomLocationChanged(lastWeatherEntry)
     }
 
-    private fun hasCustomLocationChanged(lastWeatherEntry: CurrentWeatherModel): Boolean {
-        val customLocationName = getCustomLocationName()
-        return customLocationName != lastWeatherEntry.name
+    private fun hasCustomLocationChanged(lastWeatherEntry: CurrentWeatherEntry): Boolean {
+        if (!isUsingDeviceLocation()) {
+            val customLocationName = getCustomLocationName()
+            return customLocationName != lastWeatherEntry.name
+        }
+        return false
     }
 
-    private suspend fun hasDeviceLocationChanged(lastWeatherEntry: CurrentWeatherModel): Boolean {
+    private suspend fun hasDeviceLocationChanged(lastWeatherEntry: CurrentWeatherEntry): Boolean {
         if (!isUsingDeviceLocation())
             return false
 

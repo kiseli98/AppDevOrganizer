@@ -14,6 +14,7 @@ import md.utm.organizer.data.provider.UnitProviderImpl
 import md.utm.organizer.data.repository.ForecastRepository
 import md.utm.organizer.data.repository.ForecastRepositoryImpl
 import md.utm.organizer.ui.weather.current.CurrentWeatherViewModelFactory
+import md.utm.organizer.ui.weather.future.list.FutureListWeatherViewModelFactory
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.androidXModule
@@ -33,6 +34,7 @@ class OrganizerApplication : Application(), KodeinAware {
         bind() from singleton { ForecastDatabase(instance()) } //bind() from - to bind same class type
         //<>instance type, returns whatever from above
         bind() from singleton { instance<ForecastDatabase>().currentWeatherDao() }
+        bind() from singleton { instance<ForecastDatabase>().futureWeatherDao() }
         //injecting dependencies by binding implementations to particular interface types
         bind<ConnectivityInterceptor>() with singleton { ConnectivityInterceptorImpl(instance()) } //bind with() to bind different class types
         bind() from singleton { WeatherstackApiService(instance()) }
@@ -42,8 +44,9 @@ class OrganizerApplication : Application(), KodeinAware {
         bind<LocationProvider>() with singleton { LocationProviderImpl(instance(), instance()) }
         bind<UnitProvider>() with singleton { UnitProviderImpl(instance()) }
         //needs 4 instances - WeatherNetworkDataSource and currentWeatherDao, Location Provider and WeatherLocationDao
-        bind<ForecastRepository>() with singleton { ForecastRepositoryImpl(instance(), instance(), instance(), instance()) }
-        bind() from provider { CurrentWeatherViewModelFactory(instance(), instance()) } //provider because no singletons are required
+        bind<ForecastRepository>() with singleton { ForecastRepositoryImpl(instance(), instance(), instance(), instance(), instance()) }
+        bind() from provider { CurrentWeatherViewModelFactory(instance(), instance()) }
+        bind() from provider { FutureListWeatherViewModelFactory(instance(), instance()) } //provider because no singletons are required
     }
 
     override fun onCreate() {
