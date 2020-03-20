@@ -43,4 +43,9 @@ class Converters {
 
     @TypeConverter
     fun dateToString(dateTime: LocalDateTime?) = dateTime?.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+
+    fun stringToDateNorm(str: String?) = str?.let {
+        LocalDateTime.parse(it, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+    }
+
 }

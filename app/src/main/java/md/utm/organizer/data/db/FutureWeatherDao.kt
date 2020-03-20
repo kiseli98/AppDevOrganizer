@@ -20,8 +20,12 @@ interface FutureWeatherDao {
     @Query("select * from future_weather where date(dtTxt) >= date(:startDate)")
     fun getSimpleWeatherForecast(startDate: LocalDateTime): LiveData<List<SimpleFutureWeatherEntry>> // live data - observer for other components
 
-    @Query("select * from future_weather where date(dtTxt) = date(:date)")
+    @Query("select * from future_weather where datetime(dtTxt) = datetime(:date)")
     fun getDetailedWeatherByDate(date: LocalDateTime): LiveData<DetailFutureWeatherEntry>
+
+    @Query("select * from future_weather where datetime(dtTxt) = datetime(:date)")
+    fun getDetailedWeatherByDateSimple(date: LocalDateTime): DetailFutureWeatherEntry
+
 
     @Query("select count(idn) from future_weather where date(dtTxt) >= date(:startDate)")
     fun countFutureWeather(startDate: LocalDateTime): Int

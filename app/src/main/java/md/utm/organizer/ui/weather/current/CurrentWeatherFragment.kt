@@ -67,7 +67,6 @@ class CurrentWeatherFragment : ScopedFragment(), KodeinAware {
 
             //first time call will be null
             if (it == null) return@Observer
-            textView_condition.text = it.toString()
             group_loading.visibility = View.GONE
             updateLocation(it.name)
             updateDateToToday()
