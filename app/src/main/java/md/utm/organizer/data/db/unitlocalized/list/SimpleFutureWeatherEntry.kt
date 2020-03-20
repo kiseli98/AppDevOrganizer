@@ -1,4 +1,4 @@
-package md.utm.organizer.data.db.unitlocalized
+package md.utm.organizer.data.db.unitlocalized.list
 
 import androidx.room.ColumnInfo
 import md.utm.organizer.data.network.response.currentWeather.WeatherDesc

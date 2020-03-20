@@ -9,7 +9,8 @@ import md.utm.organizer.data.db.CurrentWeatherDao
 import md.utm.organizer.data.db.FutureWeatherDao
 import md.utm.organizer.data.network.WeatherNetworkDataSource
 import md.utm.organizer.data.db.entity.CurrentWeatherEntry
-import md.utm.organizer.data.db.unitlocalized.SimpleFutureWeatherEntry
+import md.utm.organizer.data.db.unitlocalized.detail.DetailFutureWeatherEntry
+import md.utm.organizer.data.db.unitlocalized.list.SimpleFutureWeatherEntry
 import md.utm.organizer.data.network.FORECAST_DAYS_COUNT
 import md.utm.organizer.data.network.response.futureWeather.FutureWeatherResponse
 import md.utm.organizer.data.provider.LocationProvider
@@ -53,6 +54,14 @@ class ForecastRepositoryImpl(
         return withContext(Dispatchers.IO) {
             initWeatherData()
             return@withContext futureWeatherDao.getSimpleWeatherForecast(startDate)
+        }
+    }
+
+
+    override suspend fun getFutureWeatherByDate(date: LocalDate): LiveData<out DetailFutureWeatherEntry> {
+        return withContext(Dispatchers.IO) {
+            initWeatherData()
+            return@withContext futureWeatherDao.getDetailedWeatherByDate(date)
         }
     }
 

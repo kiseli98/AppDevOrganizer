@@ -9,14 +9,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.ViewHolder
 import kotlinx.android.synthetic.main.future_list_weather_fragment.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import md.utm.organizer.R
-import md.utm.organizer.data.db.unitlocalized.SimpleFutureWeatherEntry
+import md.utm.organizer.data.db.unitlocalized.list.SimpleFutureWeatherEntry
 import md.utm.organizer.ui.base.ScopedFragment
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein

@@ -1,10 +1,11 @@
 package md.utm.organizer.ui.weather.future.list
 
+import android.util.Log
 import com.xwray.groupie.kotlinandroidextensions.Item
 import com.xwray.groupie.kotlinandroidextensions.ViewHolder
 import kotlinx.android.synthetic.main.item_future_weather.*
 import md.utm.organizer.R
-import md.utm.organizer.data.db.unitlocalized.SimpleFutureWeatherEntry
+import md.utm.organizer.data.db.unitlocalized.list.SimpleFutureWeatherEntry
 import md.utm.organizer.data.provider.UnitProvider
 import md.utm.organizer.internal.UnitSystem
 import md.utm.organizer.internal.glide.GlideApp

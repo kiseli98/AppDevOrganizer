@@ -6,7 +6,8 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import md.utm.organizer.data.db.entity.FutureWeatherEntry
-import md.utm.organizer.data.db.unitlocalized.SimpleFutureWeatherEntry
+import md.utm.organizer.data.db.unitlocalized.detail.DetailFutureWeatherEntry
+import md.utm.organizer.data.db.unitlocalized.list.SimpleFutureWeatherEntry
 import org.threeten.bp.LocalDate
 
 @Dao
@@ -17,6 +18,9 @@ interface FutureWeatherDao {
 
     @Query("select * from future_weather where date(dtTxt) >= date(:startDate)")
     fun getSimpleWeatherForecast(startDate: LocalDate): LiveData<List<SimpleFutureWeatherEntry>> // live data - observer for other components
+
+    @Query("select * from future_weather where date(dtTxt) = date(:date)")
+    fun getDetailedWeatherByDate(date: LocalDate): LiveData<DetailFutureWeatherEntry>
 
     @Query("select count(idn) from future_weather where date(dtTxt) >= date(:startDate)")
     fun countFutureWeather(startDate: LocalDate): Int

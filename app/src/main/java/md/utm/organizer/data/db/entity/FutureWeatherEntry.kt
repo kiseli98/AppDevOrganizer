@@ -11,7 +11,7 @@ import md.utm.organizer.utils.Converters
 data class FutureWeatherEntry(
     @PrimaryKey(autoGenerate = true)
     val idn: Int? = null,
-    @Embedded(prefix = "clouds")
+    @Embedded(prefix = "clouds_")
     val clouds: Clouds,
     @SerializedName("dt_txt")
     val dtTxt: String,
@@ -23,6 +23,6 @@ data class FutureWeatherEntry(
     val snow: Snow? = null,
     @SerializedName("weather")
     val weatherDescription: List<WeatherDesc>,
-    @Embedded(prefix = "wind")
+    @Embedded(prefix = "wind_")
     val wind: Wind
 )

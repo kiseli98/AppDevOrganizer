@@ -78,7 +78,7 @@
             app:layout_constraintStart_toEndOf="@+id/textView_temperature"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.0"
-            app:layout_constraintWidth_percent="0.15"
+            app:layout_constraintWidth_percent="0.125"
             tools:src="@drawable/ic_weather_sunny"
             tools:tint="#f9a920" />
 
