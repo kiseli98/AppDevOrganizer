@@ -3,10 +3,11 @@ package md.utm.organizer.data.db.unitlocalized.detail
 import androidx.room.ColumnInfo
 import md.utm.organizer.data.network.response.currentWeather.WeatherDesc
 import org.threeten.bp.LocalDate
+import org.threeten.bp.LocalDateTime
 
 data class DetailFutureWeatherEntry(
     @ColumnInfo(name = "dtTxt")
-    val date: LocalDate,
+    val date: LocalDateTime,
     @ColumnInfo(name = "tempMax")
     val maxTemp: Double,
     @ColumnInfo(name = "tempMin")

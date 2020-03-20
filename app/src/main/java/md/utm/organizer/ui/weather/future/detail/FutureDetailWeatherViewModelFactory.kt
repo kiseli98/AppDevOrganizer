@@ -6,9 +6,10 @@ import androidx.lifecycle.ViewModelProvider
 import md.utm.organizer.data.provider.UnitProvider
 import md.utm.organizer.data.repository.ForecastRepository
 import org.threeten.bp.LocalDate
+import org.threeten.bp.LocalDateTime
 
 class FutureDetailWeatherViewModelFactory(
-    private val detailDate: LocalDate,
+    private val detailDate: LocalDateTime,
     private val forecastRepository: ForecastRepository,
     private val unitProvider: UnitProvider
 ) : ViewModelProvider.NewInstanceFactory() {

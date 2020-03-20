@@ -7,7 +7,7 @@ import md.utm.organizer.data.db.entity.CurrentWeatherEntry
 import md.utm.organizer.data.network.response.futureWeather.FutureWeatherResponse
 import md.utm.organizer.internal.NoConnectivityException
 
-const val FORECAST_DAYS_COUNT = 10
+const val FORECAST_DAYS_COUNT = 40
 
 class WeatherNetworkDataSourceImpl(
     private val weatherstackApiService: WeatherstackApiService

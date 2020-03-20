@@ -16,6 +16,7 @@ import md.utm.organizer.data.network.response.futureWeather.FutureWeatherRespons
 import md.utm.organizer.data.provider.LocationProvider
 import md.utm.organizer.data.provider.UnitProvider
 import org.threeten.bp.LocalDate
+import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZonedDateTime
 import java.util.*
 import kotlin.collections.HashMap
@@ -50,7 +51,7 @@ class ForecastRepositoryImpl(
         }
     }
 
-    override suspend fun getFutureWeatherList(startDate: LocalDate): LiveData<out List<SimpleFutureWeatherEntry>> {
+    override suspend fun getFutureWeatherList(startDate: LocalDateTime): LiveData<out List<SimpleFutureWeatherEntry>> {
         return withContext(Dispatchers.IO) {
             initWeatherData()
             return@withContext futureWeatherDao.getSimpleWeatherForecast(startDate)
@@ -58,7 +59,7 @@ class ForecastRepositoryImpl(
     }
 
 
-    override suspend fun getFutureWeatherByDate(date: LocalDate): LiveData<out DetailFutureWeatherEntry> {
+    override suspend fun getFutureWeatherByDate(date: LocalDateTime): LiveData<out DetailFutureWeatherEntry> {
         return withContext(Dispatchers.IO) {
             initWeatherData()
             return@withContext futureWeatherDao.getDetailedWeatherByDate(date)
@@ -76,7 +77,7 @@ class ForecastRepositoryImpl(
     private fun persistFetchedFutureWeather(fetchedWeather: FutureWeatherResponse) {
 
         fun deleteOldForecastData() {
-            val today = LocalDate.now()
+            val today = LocalDateTime.now()
             futureWeatherDao.deleteOldEntries(today)
         }
 
@@ -169,7 +170,7 @@ class ForecastRepositoryImpl(
     }
 
     private fun isFetchFutureNeeded(): Boolean {
-        val today = LocalDate.now()
+        val today = LocalDateTime.now()
         val futureWeatherCount = futureWeatherDao.countFutureWeather(today)
         return futureWeatherCount < FORECAST_DAYS_COUNT
     }

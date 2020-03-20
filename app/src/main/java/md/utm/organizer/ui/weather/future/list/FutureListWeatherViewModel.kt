@@ -5,6 +5,7 @@ import md.utm.organizer.data.repository.ForecastRepository
 import md.utm.organizer.internal.lazyDeffered
 import md.utm.organizer.ui.base.WeatherViewModel
 import org.threeten.bp.LocalDate
+import org.threeten.bp.LocalDateTime
 
 class FutureListWeatherViewModel(
     private val forecastRepository: ForecastRepository,
@@ -12,7 +13,7 @@ class FutureListWeatherViewModel(
 ) : WeatherViewModel(forecastRepository, unitProvider) {
 
     val weatherEntries by lazyDeffered {
-        forecastRepository.getFutureWeatherList(LocalDate.now())
+        forecastRepository.getFutureWeatherList(LocalDateTime.now())
     }
 
 

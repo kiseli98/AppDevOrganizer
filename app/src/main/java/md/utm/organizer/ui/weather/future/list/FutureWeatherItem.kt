@@ -11,6 +11,7 @@ import md.utm.organizer.internal.UnitSystem
 import md.utm.organizer.internal.glide.GlideApp
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.FormatStyle
+import java.time.LocalDateTime
 
 class FutureWeatherItem(
     val weatherEntry: SimpleFutureWeatherEntry,
@@ -34,7 +35,7 @@ class FutureWeatherItem(
 
     // extension function to use with ViewHolder
     private fun ViewHolder.updateDate() {
-        val dtFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM) // e.g. Mar 15, 2020
+        val dtFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT) // e.g. Mar 15, 2020
         textView_date.text = weatherEntry.date.format(dtFormatter)
     }
 

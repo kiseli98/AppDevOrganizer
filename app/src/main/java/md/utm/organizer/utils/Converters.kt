@@ -5,6 +5,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import md.utm.organizer.data.network.response.currentWeather.WeatherDesc
 import org.threeten.bp.LocalDate
+import org.threeten.bp.LocalDateTime
 import org.threeten.bp.format.DateTimeFormatter
 
 
@@ -37,9 +38,9 @@ class Converters {
 
     @TypeConverter
     fun stringToDate(str: String?) = str?.let {
-        LocalDate.parse(it.split(" ")[0], DateTimeFormatter.ISO_LOCAL_DATE)
+        LocalDateTime.parse(it.split(" ").joinToString("T"), DateTimeFormatter.ISO_LOCAL_DATE_TIME)
     }
 
     @TypeConverter
-    fun dateToString(dateTime: LocalDate?) = dateTime?.format(DateTimeFormatter.ISO_LOCAL_DATE)
+    fun dateToString(dateTime: LocalDateTime?) = dateTime?.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
 }
