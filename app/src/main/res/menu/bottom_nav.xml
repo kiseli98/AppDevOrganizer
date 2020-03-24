@@ -9,6 +9,10 @@
             android:icon="@drawable/ic_calendar_week"
             android:title="5 days"/>
     <item
+        android:id="@+id/timerFragment"
+        android:icon="@drawable/ic_timer"
+        android:title="Timer"/>
+    <item
             android:id="@+id/settingsFragment"
             android:icon="@drawable/ic_settings"
             android:title="Settings"/>
