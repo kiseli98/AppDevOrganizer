@@ -44,6 +44,9 @@ dependencies {
     implementation "android.arch.navigation:navigation-fragment-ktx:1.0.0"
     implementation "android.arch.navigation:navigation-ui-ktx:1.0.0"
 
+    // Progressbar for timer
+    implementation 'me.zhanghai.android.materialprogressbar:library:1.4.2'
+
 //    Android extension for kotlin and constraints layout
     implementation "androidx.core:core-ktx:1.0.0"
     implementation "androidx.constraintlayout:constraintlayout:1.1.3"

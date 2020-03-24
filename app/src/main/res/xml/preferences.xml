@@ -26,4 +26,9 @@
           android:entryValues="@array/unitSystemValues"
           android:entries="@array/unitSystemEntries" />
     </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Timer">
+
+    </PreferenceCategory>
 </PreferenceScreen>
