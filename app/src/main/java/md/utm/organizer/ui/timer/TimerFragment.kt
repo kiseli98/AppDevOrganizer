@@ -1,5 +1,9 @@
 package md.utm.organizer.ui.timer
 
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
 import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -13,8 +17,38 @@ import kotlinx.android.synthetic.main.timer_fragment.*
 
 import md.utm.organizer.R
 import md.utm.organizer.utils.PrefUtil
+import java.util.*
 
 class TimerFragment : Fragment() {
+
+    // no care for the fragment inner content
+    companion object {
+        fun setAlaram(context: Context, nowSeconds: Long, secondsRemaining: Long): Long {
+            val wakeUpTime = (nowSeconds + secondsRemaining) * 1000
+            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            //intent what is going to be opened after alarm goes off
+            val intent = Intent(context, TimerExpiredReciever::class.java) // subscribe to alarm
+            val pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0)
+            alarmManager.setExact(
+                AlarmManager.RTC_WAKEUP,
+                wakeUpTime,
+                pendingIntent
+            ) // wake up if is in sleep
+            PrefUtil.setAlarmSetTime(nowSeconds, context)
+            return wakeUpTime
+        }
+
+        fun removeAlarm(context: Context) {
+            val intent = Intent(context, TimerExpiredReciever::class.java)
+            val pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0)
+            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            alarmManager.cancel(pendingIntent)
+            PrefUtil.setAlarmSetTime(0, context)
+        }
+
+        val nowSeconds: Long
+            get() = Calendar.getInstance().timeInMillis / 1000
+    }
 
     enum class TimerState {
         Stopped, Paused, Running
@@ -25,10 +59,6 @@ class TimerFragment : Fragment() {
     private var timerState = TimerState.Stopped
 
     private var secondsRemaining = 0L
-
-    companion object {
-        fun newInstance() = TimerFragment()
-    }
 
 
     override fun onCreateView(
@@ -65,7 +95,8 @@ class TimerFragment : Fragment() {
         super.onResume()
         initTimer()
 
-
+        //remove background timer
+        removeAlarm(this.context!!)
     }
 
     override fun onPause() {
@@ -73,6 +104,9 @@ class TimerFragment : Fragment() {
 
         if (timerState == TimerState.Running) {
             timer.cancel()
+
+            //start backgroundTimer
+            val wakeupTime  = setAlaram(this.context!!, nowSeconds, secondsRemaining)
         } else if (timerState == TimerState.Paused) {
 
         }
@@ -95,14 +129,22 @@ class TimerFragment : Fragment() {
         else
             timerLengthSeconds
 
-        if(timerState == TimerState.Running)
+        //change seconds remaining according to where background timer stopped
+        val alarmSetTime = PrefUtil.getAlarmSetTime(this.context!!)
+        if (alarmSetTime > 0 )
+            secondsRemaining -= nowSeconds - alarmSetTime // get time in seconds for  with the timer was running in the background and subtract that from remaining
+
+        if(secondsRemaining <= 0)
+            onTimerFinished()
+        //resume where left off
+        else if (timerState == TimerState.Running)
             startTimer()
         updateButtons()
         updateCountdownUI()
     }
 
     private fun onTimerFinished() {
-        timerState= TimerState.Stopped
+        timerState = TimerState.Stopped
 
         setNewTimerLength()
 
@@ -116,7 +158,7 @@ class TimerFragment : Fragment() {
 
 
     private fun startTimer() {
-        timerState= TimerState.Running
+        timerState = TimerState.Running
         timer = object : CountDownTimer(secondsRemaining * 1000, 1000) {
             override fun onFinish() = onTimerFinished()
 
@@ -143,14 +185,14 @@ class TimerFragment : Fragment() {
         val secondsInMinuteUntilFinished = secondsRemaining - minutesUntilFinished * 60
         val secondsStr = secondsInMinuteUntilFinished.toString()
         textView_countdown.text = "$minutesUntilFinished:${
-        if (secondsStr.length == 2) secondsStr 
+        if (secondsStr.length == 2) secondsStr
         else "0" + secondsStr}"
 
         progress_countdown.progress = (timerLengthSeconds - secondsRemaining).toInt()
     }
 
     private fun updateButtons() {
-        when(timerState) {
+        when (timerState) {
             TimerState.Running -> {
                 fab_start.isEnabled = false
                 fab_pause.isEnabled = true
