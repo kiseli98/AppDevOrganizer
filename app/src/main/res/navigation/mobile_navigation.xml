@@ -37,4 +37,9 @@
         android:name="md.utm.organizer.ui.timer.TimerFragment"
         android:label="timer_fragment"
         tools:layout="@layout/timer_fragment" />
+    <fragment
+        android:id="@+id/chatFragment"
+        android:name="md.utm.organizer.ui.chat.ChatFragment"
+        android:label="chat_fragment"
+        tools:layout="@layout/chat_fragment" />
 </navigation>

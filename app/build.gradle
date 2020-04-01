@@ -47,6 +47,9 @@ dependencies {
     // Progressbar for timer
     implementation 'me.zhanghai.android.materialprogressbar:library:1.4.2'
 
+    //seek bar for timer
+    implementation 'com.pavelsikun:material-seekbar-preference:2.3.0+'
+
 //    Android extension for kotlin and constraints layout
     implementation "androidx.core:core-ktx:1.0.0"
     implementation "androidx.constraintlayout:constraintlayout:1.1.3"

@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
@@ -16,6 +17,7 @@ import kotlinx.android.synthetic.main.content_timer.*
 import kotlinx.android.synthetic.main.timer_fragment.*
 
 import md.utm.organizer.R
+import md.utm.organizer.utils.NotificationUtil
 import md.utm.organizer.utils.PrefUtil
 import java.util.*
 
@@ -97,6 +99,7 @@ class TimerFragment : Fragment() {
 
         //remove background timer
         removeAlarm(this.context!!)
+        NotificationUtil.hideTimerNotification(this.context!!)
     }
 
     override fun onPause() {
@@ -104,11 +107,11 @@ class TimerFragment : Fragment() {
 
         if (timerState == TimerState.Running) {
             timer.cancel()
-
             //start backgroundTimer
             val wakeupTime  = setAlaram(this.context!!, nowSeconds, secondsRemaining)
+            NotificationUtil.showTimerRunning(this.context!!, wakeupTime)
         } else if (timerState == TimerState.Paused) {
-
+            NotificationUtil.showTimerPaused(this.context!!)
         }
 
         PrefUtil.setPreviousTimerLengthSeconds(timerLengthSeconds, this.context!!)
@@ -212,5 +215,6 @@ class TimerFragment : Fragment() {
             }
         }
     }
+
 
 }

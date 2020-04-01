@@ -10,8 +10,11 @@ class PrefUtil {
         private const val PREVIOUS_TIMER_LENGTH_SECONDS_ID =
             "md.utm.organizer.timer.previous_timer_length"
 
+        private const val TIMER_LENGTH_ID = "md.utm.organizer.timer.timer_length"
+
         fun getTimerLength(context: Context): Int {
-            return 1
+            val preferences = PreferenceManager.getDefaultSharedPreferences(context)
+            return preferences.getInt(TIMER_LENGTH_ID, 1)
         }
 
         private const val TIMER_STATE_ID = "md.utm.organizer.timer.timer_state"
